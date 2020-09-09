@@ -52,6 +52,8 @@ type Movie = {
   runtime: number;
 };
 
+const { ipcRenderer } = window.require("electron");
+
 const useStyles = makeStyles({
   root: {
     maxWidth: 250,
@@ -86,6 +88,12 @@ function MovieCard({ movie }: { movie: Movie }) {
 }
 
 function App() {
+  const [folder, setFolder] = useState("");
+  useEffect(() => {
+    ipcRenderer.on("folder", (event: any, folder: string) => setFolder(folder));
+    return () => ipcRenderer.removeAllListeners("folder");
+  }, []);
+
   const [movies, setMovies] = useState([] as Movie[]);
   useEffect(() => {
     setMovies(
@@ -106,6 +114,7 @@ function App() {
   }, [setMovies]);
   return (
     <Container>
+      <p>{folder}</p>
       <Grid container spacing={2}>
         {movies.map((movie) => (
           <Grid item key={movie.imdbID}>
